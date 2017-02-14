@@ -59,9 +59,6 @@ def ios_connect(username, password, ip_address,commands, enablepw='!'):
         except:
             return False
 
-
-
-
 try:
     parser = argparse.ArgumentParser(description='Description of your program')
     parser.add_argument('-u','--user', help='Device Username', required=True)

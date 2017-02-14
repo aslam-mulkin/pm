@@ -1,3 +1,18 @@
-show runn
+show clock
 show ver
 show ip inter brief
+show proc cpu sort | ex 0.0
+show proc mem
+show logg
+show runn
+show cdp nei
+show cdp nei de
+show ip inter brief
+show ip route
+show access-list
+show inter desc
+show vlan brief
+show inter trunk
+show env all
+show tech
+copy runn start

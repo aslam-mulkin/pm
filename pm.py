@@ -75,7 +75,7 @@ except:
 else:    
     fh = open("commandlist.txt")
     commands = fh.readlines()
-    print commands
+
     fip = open("ip_list.txt")
     ips = fip.readlines()
     

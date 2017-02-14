@@ -1,0 +1,3 @@
+show runn
+show ver
+show ip inter brief

@@ -18,7 +18,7 @@ def usage():
    print "Usage: pm.exe <options>"
    print "\n"
    print "REQUIRED OPTIONS:"
-   print "   -h  --host <hostname|ip>   = hostname or ip address"
+   #print "   -h  --host <hostname|ip>   = hostname or ip address"
    print "   -u  --user <username>      = username to login with"
    print "   -p --password <password>      = password for login"
    print "\n"

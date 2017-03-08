@@ -6,8 +6,9 @@
 #-------------------------------------------------
 
 from netmiko import ConnectHandler
-import sys
+import sys, time
 import argparse
+from threading import Thread
 
 #-----------------------------------------------
 # Usage()
@@ -31,7 +32,7 @@ def usage():
 #     Connect to device and return an output
 #-----------------------------------------------
 
-def ios_connect(username, password, ip_address,commands, enablepw='!'):
+def ios_connect(username="", password="",commands="", enablepw='!', ip_address=""):
 
     device = dict()
     device['username'] = username   
@@ -39,26 +40,50 @@ def ios_connect(username, password, ip_address,commands, enablepw='!'):
     device['secret'] = enablepw
     device['ip'] = ip_address
   
+    output_file = ip_address+".txt"
+    fo = open(output_file,"w")
     try:
         device['device_type'] = 'cisco_ios_ssh'
         net_connect = ConnectHandler(**device)
-        outputs = []
-        if device['secret'] != '!':
-            net_connect.enable()
-        
-        for command in commands:    
-            output = net_connect.send_command(command)
-            outputs.append(output)
-        return outputs
-
+        time.sleep(3)
     except:
         try:
             device['device_type'] = 'cisco_ios_telnet'
             net_connect = ConnectHandler(**device)
-            return net_connect
+            time.sleep(3)
         except:
+            hasil = "Error connecting "
+            fo.write(hasil)
             return False
+    else:        
+        outputs = []        
+        if device['secret'] != '!':
+            net_connect.enable()
+        
+        for command in commands:    
+            output = net_connect.send_command_expect(command)
+            outputs.append(output)
+        
+        hasil = '\n'.join(outputs)
+        fo.write(hasil)
+        fo.close()
+        return outputs
+        net_connect.clear_buffer()
+        net_connect.disconnect()
+        
+        
 
+import logging
+
+paramiko_logger = logging.getLogger('paramiko.transport')
+if not paramiko_logger.handlers:
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(
+        logging.Formatter('%(asctime)s | %(levelname)-8s| PARAMIKO: '
+                          '%(lineno)03d@%(module)-10s| %(message)s')
+        )
+    paramiko_logger.addHandler(console_handler)
+    
 try:
     parser = argparse.ArgumentParser(description='Description of your program')
     parser.add_argument('-u','--user', help='Device Username', required=True)
@@ -69,7 +94,7 @@ try:
 except:
     usage()
     sys.exit()
-else:    
+else:
     fh = open("commandlist.txt")
     commands = fh.readlines()
 
@@ -78,15 +103,16 @@ else:
     
     for ip in ips:
         ip = ip.rstrip()
-        output_file = ip+".txt"
-        fo = open(output_file,"w")
-    
-        #output = ios_connect(args['user'],args['password'],args['ip'],commands,args['enable'])
-        output = ios_connect(args['user'],args['password'],ip,commands,args['enable'])
+        t=Thread(target=ios_connect, args=(args['user'],args['password'],commands,args['enable'],ip))
+        t.start()
+
+'''        
+        output = ios_connect(args['user'],args['password'],commands,args['enable'],ip)
         if output is False:
             print "Error Connecting to ",ip
             fo.write ("Error Connecting to ",ip)
         else:
             hasil = '\n'.join(output)
             print "Capturing ",ip,"..."
-            fo.write(hasil)
+        fo.write(hasil)
+'''        

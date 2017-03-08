@@ -1,6 +1,2 @@
 show run
-show ip inter brief
-show vlan
-show inter desc
-show proc cpu sort | ex 0.0
-show proc mem
+show ip inter br
